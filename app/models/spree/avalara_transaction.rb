@@ -91,15 +91,10 @@ module Spree
     end
 
     def compute_amount(adjustable)
-     binding.pry
      logger = Logger.new('log/post_order_to_avalara.txt', 'weekly')
-
-     #logger.level = :debug
-
      logger.progname = 'avalara_transaction'
-
      logger.info 'compute amount call'
-     post_order_to_avalara(false, order.line_items, order)
+     post_order_to_avalara(false, adjustable.line_items, adjustable)
      return rnt_tax
     end
 
@@ -199,7 +194,7 @@ module Spree
           line = Hash.new
           i += 1
           # Required Parameters
-          line[:LineNo] = i
+          line[:LineNo] = i.to_s
           line[:ItemCode] = line_item.variant.sku
           line[:Qty] = line_item.quantity
           line[:Amount] = line_item.total.to_f
@@ -245,24 +240,24 @@ module Spree
 
           if stock_loc
             orig_ship_address = Hash.new
-            orig_ship_address[:AddressCode] = line_item.id
+            orig_ship_address[:AddressCode] = line_item.id.to_s
             orig_ship_address[:Line1] = stock_loc.address1
             orig_ship_address[:City] = stock_loc.city
             orig_ship_address[:PostalCode] = stock_loc.zipcode
             orig_ship_address[:Country] = Country.find(stock_loc.country_id).iso
             #this will set the shipped from address linking
-            line[:OriginCode] = line_item.id
+            line[:OriginCode] = line_item.id.to_s
             logger.debug orig_ship_address.to_xml
             addresses<<orig_ship_address
           elsif location
             orig_ship_address = Hash.new
-            orig_ship_address[:AddressCode] = line_item.id
+            orig_ship_address[:AddressCode] = line_item.id.to_s
             orig_ship_address[:Line1] = location.address1
             orig_ship_address[:City] = location.city
             orig_ship_address[:PostalCode] = location.zipcode
             orig_ship_address[:Country] = Country.find(location.country_id).iso
             #this will set the shipped from address linking
-            line[:OriginCode] = line_item.id
+            line[:OriginCode] = line_item.id.to_s
             logger.debug orig_ship_address.to_xml
             addresses<<orig_ship_address
           end
@@ -289,7 +284,7 @@ module Spree
             line[:DestinationCode] = "Dest"
 
             if myusecode
-              line[:CustomerUsageType]= myusecode.use_code || ""
+              #line[:CustomerUsageType]= myusecode.use_code || ""
               #line[:ExemptionNo] = myuser.exemption_number || ""
             end
             #line[:CustomerUsageType]= User.use_code
@@ -312,7 +307,7 @@ module Spree
           line = Hash.new
           i += 1
           # Required Parameters
-          line[:LineNo] = i
+          line[:LineNo] = i.to_s
           line[:ItemCode] = "Promotion"
           line[:Qty] = "0"
           line[:Amount] = adj.amount.to_f
@@ -344,7 +339,7 @@ module Spree
           line = Hash.new
           i += 1
           # Required Parameters
-          line[:LineNo] = i
+          line[:LineNo] = i.to_s
           line[:ItemCode] = "Return Authorization"
           line[:Qty] = "0"
           line[:Amount] = adj.amount.to_f
@@ -395,6 +390,7 @@ module Spree
       addresses<<billing_address
       addresses<<orig_address
 
+      logger.debug addresses.to_xml
 
       gettaxes = {
           :CustomerCode => Spree::Config.avatax_customer_code,

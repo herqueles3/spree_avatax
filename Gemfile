@@ -10,11 +10,11 @@ gemspec
 # gem 'psych', '~> 2.0.4'
 # gem 'logging'
 
-#binding pry
-# group :development do
-#   gem 'guard'
-#   gem 'guard-rspec'
-#   gem 'pry'
-#   gem 'pry-remote'
-#   gem 'pry-nav'
-# end
+binding pry
+group :development do
+  gem 'guard'
+  gem 'guard-rspec'
+  gem 'pry'
+  gem 'pry-remote'
+  gem 'pry-nav'
+end
